@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class AlaMaKota {
+public class PlayStoreTest {
 
 
     private AndroidDriver<AndroidElement> driver;
