@@ -1,9 +1,11 @@
 package Steps;
 
+import Framework.Capabilities;
 import PageObjects.PlayStoreHomePage;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
-import javafx.print.PageLayout;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -16,6 +18,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -27,8 +32,8 @@ public class PlayStoreTest {
     private PlayStoreHomePage playStoreHomePage;
 
     @BeforeMethod
-    public void setUp(ITestContext context) throws MalformedURLException {
-        driver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4729/wd/hub"), getCapabilities());
+    public void setUp(ITestContext context) throws MalformedURLException, FileNotFoundException {
+        driver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4729/wd/hub"), setUpCapabilities(context));
         wait = new WebDriverWait(driver, 30)
                 .ignoring(StaleElementReferenceException.class)
                 .ignoring(NullPointerException.class)
@@ -39,6 +44,26 @@ public class PlayStoreTest {
         context.setAttribute("wait", this.wait);
 
         playStoreHomePage = new PlayStoreHomePage(context);
+
+
+    }
+
+//    @BeforeMethod
+    public DesiredCapabilities setUpCapabilities(ITestContext context) throws FileNotFoundException {
+        BufferedReader br = new BufferedReader(new FileReader("./src/test/resources/capabilitiesData.json"));
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Capabilities capabilities = gson.fromJson(br,Capabilities.class);
+
+        DesiredCapabilities capabilities1 = new DesiredCapabilities();
+        capabilities1.setCapability("BROWSER_NAME", capabilities.getBROWSER_NAME());
+        capabilities1.setCapability("VERSION", capabilities.getVERSION());
+        capabilities1.setCapability("deviceName", capabilities.getDevicename());
+        capabilities1.setCapability("udid", capabilities.getUdid());
+        capabilities1.setCapability("platformName", capabilities.getPlatformName());
+        capabilities1.setCapability("appPackage", capabilities.getAppPackage());
+        capabilities1.setCapability("appActivity", capabilities.getAppActivity());
+        capabilities1.setCapability("autoGrantPermissions",capabilities.getAutoGrantPermissions());
+        return capabilities1;
     }
 
 
@@ -46,7 +71,6 @@ public class PlayStoreTest {
     public Object[][] createData1() {
         return new Object[][] {
                 { "Procountor"},
-                { "Kalambury"},
         };
     }
 
@@ -64,17 +88,4 @@ public class PlayStoreTest {
         driver.quit();
     }
 
-    private DesiredCapabilities getCapabilities() {
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability("BROWSER_NAME", "Android");
-        capabilities.setCapability("VERSION", "7.0");
-        capabilities.setCapability("deviceName", "Huawei P9 lite");
-        capabilities.setCapability("udid", "BUC4C16617002452");
-        capabilities.setCapability("platformName", "Android");
-        capabilities.setCapability("appPackage", "com.android.vending");
-        capabilities.setCapability("appActivity", "com.android.vending.AssetBrowserActivity");
-        capabilities.setCapability("autoGrantPermissions", true);
-
-        return capabilities;
-    }
 }
